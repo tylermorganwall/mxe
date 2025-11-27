@@ -50,18 +50,20 @@ jobs:
         shell: msys2 {0}
         env:
           MXE_USE_CCACHE: mxe
+          CCACHE_DISABLE: "1"
           OS_SHORT_NAME: disable-native-plugins
         run: |
           make check-requirements
-          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 cc
+          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 CCACHE_DISABLE=1 cc
 
       - name: Run smoke tests
         shell: msys2 {0}
         env:
           MXE_USE_CCACHE: mxe
+          CCACHE_DISABLE: "1"
           OS_SHORT_NAME: disable-native-plugins
         run: |
-          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 cmake
+          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 CCACHE_DISABLE=1 cmake
 
       - name: Upload build artifacts
         if: always()
