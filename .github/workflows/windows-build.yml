@@ -74,3 +74,5 @@ jobs:
             settings.mk
             usr/**/config.log
             tmp-**/config.log
+            tmp-**/**/config.log
+            tmp-**/**/*.log
