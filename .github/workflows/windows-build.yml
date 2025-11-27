@@ -53,6 +53,7 @@ jobs:
           CCACHE_DISABLE: "1"
           OS_SHORT_NAME: disable-native-plugins
         run: |
+          rm -rf .ccache
           make check-requirements
           make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 MXE_USE_CCACHE= CCACHE_DISABLE=1 cc
 
