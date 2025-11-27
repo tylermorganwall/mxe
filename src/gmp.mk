@@ -43,6 +43,10 @@ define $(PKG)_BUILD
 endef
 
 define $(PKG)_BUILD_$(BUILD)
+    # Some MSYS extractions have been observed to lose gmp-h.in; ensure it exists
+    test -f '$(1)/gmp-h.in' || \
+        tar -xJf '$(PKG_DIR)/$($(PKG)_FILE)' -C '$(1)' --strip-components=1 '$(PKG)-$($(PKG)_VERSION)/gmp-h.in'
+
     mkdir '$(1).build'
     cd    '$(1).build' && '$(1)/configure' \
         $(MXE_CONFIGURE_OPTS) \
