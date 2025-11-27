@@ -1,0 +1,63 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MSYS
+          update: true
+          install: >
+            base-devel
+            git
+            autoconf
+            automake-wrapper
+            autopoint
+            bison
+            flex
+            gdk-pixbuf2
+            gperf
+            intltool
+            libtool
+            lzip
+            make
+            cmake
+            openssl
+            p7zip
+            patch
+            perl
+            pkgconf
+            python
+            python-mako
+            python-packaging
+            python-setuptools
+            ruby
+            unzip
+            wget
+            xz
+
+      - name: Build MXE toolchain
+        shell: msys2 {0}
+        env:
+          MXE_USE_CCACHE: mxe
+          OS_SHORT_NAME: disable-native-plugins
+        run: |
+          make check-requirements
+          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 cc
+
+      - name: Run smoke tests
+        shell: msys2 {0}
+        env:
+          MXE_USE_CCACHE: mxe
+          OS_SHORT_NAME: disable-native-plugins
+        run: |
+          make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 cmake
