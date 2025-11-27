@@ -14,17 +14,16 @@ jobs:
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MSYS
+          msystem: UCRT64
           update: true
           install: >
             base-devel
             git
             autoconf
             automake-wrapper
-            autopoint
+            gettext-devel
             bison
             flex
-            gdk-pixbuf2
             gperf
             intltool
             libtool
@@ -44,6 +43,8 @@ jobs:
             unzip
             wget
             xz
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-gdk-pixbuf2
 
       - name: Build MXE toolchain
         shell: msys2 {0}
