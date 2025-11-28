@@ -11,19 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Patch MXE gmp package to only build cross target
-        shell: bash
-        run: |
-          set -e
-          for f in src/gmp.mk src/packages/gmp.mk; do
-            if [ -f "$f" ]; then
-              echo "Patching $f to skip native (BUILD) GMP build"
-              sed -i 's/\$(PKG)_TARGETS := \$(BUILD) \$(MXE_TARGETS)/\$(PKG)_TARGETS := \$(MXE_TARGETS)/' "$f"
-              echo "Updated line:"
-              grep '\$(PKG)_TARGETS :=' "$f" || true
-            fi
-          done
-
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
@@ -67,6 +54,13 @@ jobs:
           OS_SHORT_NAME: disable-native-plugins
         run: |
           set -e
+
+          # Patch MXE gmp package to skip native BUILD target, which fails under MSYS2/UCRT64.
+          # After this, gmp will only be built for MXE_TARGETS (x86_64-w64-mingw32.shared).
+          if [ -f src/gmp.mk ]; then
+            sed -i 's/^$(PKG)_TARGETS.*/$(PKG)_TARGETS := $(MXE_TARGETS)/' src/gmp.mk
+          fi
+
           rm -rf .ccache
           make check-requirements
           make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 MXE_USE_CCACHE= CCACHE_DISABLE=1 cc
@@ -78,7 +72,6 @@ jobs:
           CCACHE_DISABLE: "1"
           OS_SHORT_NAME: disable-native-plugins
         run: |
-          set -e
           make MXE_TARGETS='x86_64-w64-mingw32.shared' JOBS=2 MXE_USE_CCACHE= CCACHE_DISABLE=1 cmake
 
       - name: Upload build artifacts
